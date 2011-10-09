@@ -79,5 +79,4 @@ test("testing multiple onChange listeners", function() {
 	data.key1.change(incrementCallCount);
 	data.key1('new val');
 	same(changeCallCount, 2, "both 2 onChange listeners called");
-}
-);
+});

@@ -1,15 +1,16 @@
 (function($) {
 	
 	var getEventListeners = function( data, event ) {
-		if (data.eventlisteners === undefined) {
-			data.eventlisteners = {
+		var metadata = data.__observable;
+		if (metadata.eventlisteners === undefined) {
+			metadata.eventlisteners = {
 				'change': []
 			}
 		}
 		if ( event === undefined ) {
-			return data.eventlisteners;
+			return metadata.eventlisteners;
 		} else {
-			return data.eventlisteners[event];
+			return metadata.eventlisteners[event];
 		}
 	}
 	
@@ -32,7 +33,7 @@
 					$.observable( value );
 				}
 					
-				var rval = function() {
+				var observable = function() {
 					if (arguments.length === 0) { // getter
 						return value;
 					} else { // setter
@@ -46,13 +47,21 @@
 						}
 					}
 				};
-			
-				rval.change = function(listener) {
-					getEventListeners(this, 'change').push(listener);
+				// object for storing the metadata of the observable plugin
+				observable.__observable = new Object();
+				
+				observable.on = function(event, listener) {
+					getEventListeners(this, event).push(listener);
 					return this;
 				}
+			
+				if (observable.change === undefined) {
+					observable.change = function(listener) {
+						return this.on('change', listener);
+					}
+				}
 				
-				return rval;
+				return observable;
 			
 			})(value, prop);
 			

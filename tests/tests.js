@@ -1,3 +1,7 @@
+function debug(str) {
+	console.log(str);
+}
+
 module("basic tests");
 
 test("Testing Primitive wraps", function() {
@@ -86,17 +90,36 @@ test("testing if onChange avoids infinite recursion", function() {
 		key: 'val'
 	};
 	$.observable(data);
-	
-	data.key.change(function(newVal, oldVal) {
-		data.key(oldVal, 'mycontext');
-	}, 'mycontext');
-	data.key('new val');
-	ok(true, "avoided by using context");
-	
 	data.key.change(function(newVal, oldVal) {
 		data.key(oldVal);
 	});
 	data.key('new val');
-	ok(true, "avoided by default behavior");
+	ok(true, "avoided");
 })
+
+module("Arrays");
+
+test("testing if an array is properly wrapped", function() {
+	var data = {
+		key1: 'val',
+		key2: [1, 2, 3]
+	};
+	$.observable(data);
+	var _newVal = null;
+	data.key2.on('elemchange', function(key, newVal) {
+		same(key, 1, "key param is good in array.elemchange callback");
+		_newVal = newVal;
+	})
+	data.key2()(1, 'new elem');
+	same(_newVal, 'new elem', "testing array.elemchange event");
+	
+	// just test if it runs too
+	data.key2().on('elemchange', function(key, val){
+		
+	});
+	
+	data.key2.on('change', function(){
+		
+	});
+});
 

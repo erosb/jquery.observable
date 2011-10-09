@@ -9,20 +9,43 @@
 		}
 		if ( event === undefined ) {
 			return metadata.eventlisteners;
-		} else {
-			return metadata.eventlisteners[event];
 		}
+		if ( metadata.eventlisteners[event] === undefined ) {
+			metadata.eventlisteners[event] = [];
+		}
+		return metadata.eventlisteners[event];
 	}
 	
-	var fireOnChange = function(data, newVal, oldVal, context) {
-		var listeners = getEventListeners(data, 'change');
+	var createObservableArray = function(arr, cnt) {
+		var observable = function() {
+			switch (arguments.length) {
+				case 1:
+					return arr[arguments[0]];
+					break;
+				case 2:
+					arr[arguments[0]] = arguments[1];
+					fireEvent(cnt, 'elemchange', [arguments[0], arguments[1]]);
+					break;
+				default:
+					throw "must be called with 1 or 2 arguments, not " + arguments.length;
+			}
+		};
+		observable.__observable = new Object();
+		observable.arr = arr;
+		observable.on = cnt.on;
+		return observable;
+	};
+		
+	
+	var fireEvent = function(data, event, params) {
+		var listeners = getEventListeners(data, event);
 		for ( var i = 0; i < listeners.length; ++i ) {
 			var listener = listeners[i];
 			// listener.isRunning is a flag/lock to avoid infinite recursions (eg. when the data is modified
 			// by the listener function, then the same listener won't be called again
-			if (( ! listener.isRunning) && (context === undefined || listener.context != context)) {
+			if ( ! listener.isRunning ) {
 				listener.isRunning = true;
-				listener.fn(newVal, oldVal, data);
+				listener.fn.apply(data, params);
 				listener.isRunning = false;
 			}
 		}
@@ -34,7 +57,7 @@
 			var value = data[ prop ];
 				
 			data[ prop ] = (function(value, prop) {
-					
+				
 				// binding recursively
 				if ( $.isPlainObject( value ) ) {
 					$.observable( value );
@@ -44,11 +67,11 @@
 					if (arguments.length === 0) { // getter
 						return value;
 					} else { // setter
-						var context = (arguments.length == 1) ? undefined : arguments[1];
 						var oldVal = value;
 						value = arguments[ 0 ];
 					
-						fireOnChange( data[ prop ], value, $.observable.remove(oldVal), context);
+						fireEvent( data[ prop ], 'change'
+							, [value, $.observable.remove(oldVal)] );
 					
 						if ( $.isPlainObject( value ) ) {
 							$.observable( value );
@@ -58,20 +81,23 @@
 				// object for storing the metadata of the observable plugin
 				observable.__observable = new Object();
 				
-				observable.on = function(event, listener, context) {
+				observable.on = function(event, listener) {
 					getEventListeners(this, event).push({
-						context: context,
 						fn: listener
 					});
 					return this;
 				}
 			
 				if (observable.change === undefined) {
-					observable.change = function(listener, context) {
-						return this.on('change', listener, context);
+					observable.change = function(listener) {
+						return this.on('change', listener);
 					}
 				}
 				
+				if ( $.isArray(value) ) {
+					value = createObservableArray( value, observable );
+				}
+								
 				return observable;
 			
 			})(value, prop);

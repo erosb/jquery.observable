@@ -14,10 +14,17 @@
 		}
 	}
 	
-	var fireOnChange = function(data, newVal, oldVal) {
+	var fireOnChange = function(data, newVal, oldVal, context) {
 		var listeners = getEventListeners(data, 'change');
 		for ( var i = 0; i < listeners.length; ++i ) {
-			listeners[i](newVal, oldVal, data);
+			var listener = listeners[i];
+			// listener.isRunning is a flag/lock to avoid infinite recursions (eg. when the data is modified
+			// by the listener function, then the same listener won't be called again
+			if (( ! listener.isRunning) && (context === undefined || listener.context != context)) {
+				listener.isRunning = true;
+				listener.fn(newVal, oldVal, data);
+				listener.isRunning = false;
+			}
 		}
 	}
 	
@@ -37,10 +44,11 @@
 					if (arguments.length === 0) { // getter
 						return value;
 					} else { // setter
+						var context = (arguments.length == 1) ? undefined : arguments[1];
 						var oldVal = value;
 						value = arguments[ 0 ];
 					
-						fireOnChange( data[ prop ], value, $.observable.remove(oldVal) );
+						fireOnChange( data[ prop ], value, $.observable.remove(oldVal), context);
 					
 						if ( $.isPlainObject( value ) ) {
 							$.observable( value );
@@ -50,14 +58,17 @@
 				// object for storing the metadata of the observable plugin
 				observable.__observable = new Object();
 				
-				observable.on = function(event, listener) {
-					getEventListeners(this, event).push(listener);
+				observable.on = function(event, listener, context) {
+					getEventListeners(this, event).push({
+						context: context,
+						fn: listener
+					});
 					return this;
 				}
 			
 				if (observable.change === undefined) {
-					observable.change = function(listener) {
-						return this.on('change', listener);
+					observable.change = function(listener, context) {
+						return this.on('change', listener, context);
 					}
 				}
 				

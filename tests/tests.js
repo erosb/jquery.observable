@@ -80,3 +80,23 @@ test("testing multiple onChange listeners", function() {
 	data.key1('new val');
 	same(changeCallCount, 2, "both 2 onChange listeners called");
 });
+
+test("testing if onChange avoids infinite recursion", function() {
+	var data = {
+		key: 'val'
+	};
+	$.observable(data);
+	
+	data.key.change(function(newVal, oldVal) {
+		data.key(oldVal, 'mycontext');
+	}, 'mycontext');
+	data.key('new val');
+	ok(true, "avoided by using context");
+	
+	data.key.change(function(newVal, oldVal) {
+		data.key(oldVal);
+	});
+	data.key('new val');
+	ok(true, "avoided by default behavior");
+})
+

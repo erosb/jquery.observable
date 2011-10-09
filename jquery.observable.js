@@ -1,5 +1,25 @@
 (function($) {
 	
+	var getEventListeners = function( data, event ) {
+		if (data.eventlisteners === undefined) {
+			data.eventlisteners = {
+				'change': []
+			}
+		}
+		if ( event === undefined ) {
+			return data.eventlisteners;
+		} else {
+			return data.eventlisteners[event];
+		}
+	}
+	
+	var fireOnChange = function(data, newVal, oldVal) {
+		var listeners = getEventListeners(data, 'change');
+		for ( var i = 0; i < listeners.length; ++i ) {
+			listeners[i](newVal, oldVal, data);
+		}
+	}
+	
 	$.observable = function(data) {
 		for ( var prop in data ) {
 				
@@ -8,28 +28,36 @@
 			data[ prop ] = (function(value, prop) {
 					
 				// binding recursively
-			if ( $.isPlainObject( value ) ) {
-				$.observable( value );
-			}
-					
-			return function() {
-				if (arguments.length === 0) { // getter
-					return value;
-				} else { // setter
-					var oldVal = value;
-					value = arguments[ 0 ];
-					
-					if ( $.isFunction( data[ prop ].onChange ) ) {
-						data[ prop ].onChange( value, $.observable.remove(oldVal) );
-					}
-					if ( $.isPlainObject( value ) ) {
-						$.observable( value );
-					}
+				if ( $.isPlainObject( value ) ) {
+					$.observable( value );
 				}
-			};
+					
+				var rval = function() {
+					if (arguments.length === 0) { // getter
+						return value;
+					} else { // setter
+						var oldVal = value;
+						value = arguments[ 0 ];
+					
+						fireOnChange( data[ prop ], value, $.observable.remove(oldVal) );
+					
+						if ( $.isPlainObject( value ) ) {
+							$.observable( value );
+						}
+					}
+				};
+			
+				rval.change = function(listener) {
+					getEventListeners(this, 'change').push(listener);
+					return this;
+				}
+				
+				return rval;
+			
 			})(value, prop);
+			
 		}
-			return data;
+		return data;
 	}
 	
 	$.observable.remove = function(data) {

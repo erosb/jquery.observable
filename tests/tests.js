@@ -165,10 +165,11 @@ test("testing basic array events", function() {
 		key2: [1, 2, 3]
 	};
 	data = $.observable(data);
-	var _newVal = null;
-	data().key2.on('elemchange', function(key, newVal) {
+	var _newVal = null, _oldVal = null;
+	data().key2.on('elemchange', function(key, newVal, oldVal) {
 		same(key, 1, "key param is correct in array.elemchange callback");
-		_newVal = newVal;
+		_newVal = newVal();
+		_oldVal = oldVal;
 	})
 
 	same( data().key2(1)(), 2, "testing array item read");
@@ -178,7 +179,8 @@ test("testing basic array events", function() {
 	same( data().key2(1)(), 2, "testing array item read");
 	
 	data().key2(1, 'new elem');
-	same(_newVal, 'new elem', "testing array.elemchange event");
+	same(_newVal, 'new elem', "testing array.elemchange newVal");
+	same(_oldVal, 2, "testing array.elemchange oldVal");
 
 	data().key2.on('change', function(newVal, oldVal){
 		same(newVal, [1], "check array.change newVal param");

@@ -99,8 +99,9 @@
 					}
 					break;
 				case 2:
-					arr[ arguments[0] ] = $.observable( arguments[1] );
-					fireEvent(observable, 'elemchange', [arguments[0], arguments[1]]);
+					var oldVal = $.observable.remove( arr[ arguments[0] ] ), newVal;
+					arr[ arguments[0] ] = newVal = $.observable( arguments[1] );
+					fireEvent(observable, 'elemchange', [arguments[0], newVal, oldVal]);
 					break;
 				default:
 					throw "must be called with 1 or 2 arguments, not " + arguments.length;

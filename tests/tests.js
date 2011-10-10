@@ -159,7 +159,7 @@ test("testing if onChange avoids infinite recursion", function() {
 
 module("Array basics");
 
-test("testing if an array is properly wrapped", function() {
+test("testing basic array events", function() {
 	var data = {
 		key1: 'val',
 		key2: [1, 2, 3]
@@ -170,10 +170,14 @@ test("testing if an array is properly wrapped", function() {
 		same(key, 1, "key param is correct in array.elemchange callback");
 		_newVal = newVal;
 	})
+
+	same( data().key2(1)(), 2, "testing array item read");
+	
 	same( $.observable.remove( data().key2() ),  [1, 2, 3],  "testing raw array read");
 	
-	same( data().key2()(1)(), 2, "testing array item read");
-	data().key2()(1, 'new elem');
+	same( data().key2(1)(), 2, "testing array item read");
+	
+	data().key2(1, 'new elem');
 	same(_newVal, 'new elem', "testing array.elemchange event");
 
 	data().key2.on('change', function(newVal, oldVal){
@@ -220,6 +224,6 @@ test("push", function() {
 	data.on('push', function(newVal) {
 		_newVal = newVal;
 	});
-	data().push( 42 );
+	data.push( 42 );
 	same( _newVal, 42, "push event is fired" );
 });

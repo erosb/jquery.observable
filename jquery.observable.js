@@ -29,6 +29,21 @@
 			}
 		}
 	}
+	
+	
+	// this function will be the on() method of all wrappers
+	var listenerAdder = function(event, listener) {
+		if ( $.isArray( event ) ) {
+			for ( var i = 0; i < event.length; ++i ) {
+				this.on( event[ i ], listener );
+			}
+			return;
+		}
+		getEventListeners(this, event).push({
+			fn: listener
+		});
+		return this;
+	};
 		
 	var createObservableObject = function(value) {
 		if ( $.isPlainObject(value) ) {
@@ -57,18 +72,7 @@
 		
 		observable.__observable = new Object();
 		
-		observable.on = function(event, listener) {
-			if ( $.isArray( event ) ) {
-				for ( var i = 0; i < event.length; ++i ) {
-					observable.on( event[ i ], listener );
-				}
-				return;
-			}
-			getEventListeners(this, event).push({
-				fn: listener
-			});
-			return this;
-		}
+		observable.on = listenerAdder;
 		
 		return observable;
 	}
@@ -107,9 +111,11 @@
 		
 		observable.__observable = new Object();
 		
+		observable.on = listenerAdder;
+		
 		observable.push = function(newItem) {
 			arr.push( $.observable(newItem) );
-			fireEvent( observable, 'push', [newItem] );
+			fireEvent( this, 'push', [newItem] );
 		}
 		
 		return observable;
@@ -126,19 +132,19 @@
 	$.observable.remove = function(data) {
 		if ( ! $.isFunction(data)) {
 			if ( $.isArray(data) ) {
+				var rval = new Array();
 				for ( var i = 0; i < data.length; ++i ) {
-					data[ i ] = $.observable.remove( data[ i ] );
+					rval[ i ] = $.observable.remove( data[ i ] );
 				}
 			}
-			return data;
+			return rval;
 		}
 		var rawData = data(); // getting the raw object
 		
-		if ( $.isFunction(rawData) ) {
+		if ( $.isArray(rawData) ) {
 			var rval = new Array();
-			var arr = rawData(); // getting the raw array
-			for(var i = 0; i < arr.length; ++i ) {
-				rval[ i ] = $.observable.remove( arr[ i ] );
+			for(var i = 0; i < rawData.length; ++i ) {
+				rval[ i ] = $.observable.remove( rawData[ i ] );
 			}
 			return rval;
 		} else if ($.isPlainObject( rawData ) ) {

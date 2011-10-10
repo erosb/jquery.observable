@@ -157,7 +157,7 @@ test("testing if onChange avoids infinite recursion", function() {
 	ok(true, "avoided");
 })
 
-module("Arrays");
+module("Array basics");
 
 test("testing if an array is properly wrapped", function() {
 	var data = {
@@ -167,10 +167,10 @@ test("testing if an array is properly wrapped", function() {
 	data = $.observable(data);
 	var _newVal = null;
 	data().key2.on('elemchange', function(key, newVal) {
-		same(key, 1, "key param is good in array.elemchange callback");
+		same(key, 1, "key param is correct in array.elemchange callback");
 		_newVal = newVal;
 	})
-	same( $.observable.remove( data().key2 ),  [1, 2, 3],  "testing raw array read");
+	same( $.observable.remove( data().key2() ),  [1, 2, 3],  "testing raw array read");
 	
 	same( data().key2()(1)(), 2, "testing array item read");
 	data().key2()(1, 'new elem');
@@ -188,11 +188,38 @@ test("testing if an array is properly wrapped", function() {
 test("testing if array item objects are properly wrapped", function() {
 	var data = {
 		arr: 
-		[1, {
-			foo: 'bar'
-		}, 3]
+		[1, 2, 3]
 	};
-	data = $.observable(data);
-	ok($.isFunction( data().arr()(1) ), "checking if array item object is wrapped");
-	same( data().arr()(1)().foo(), 'bar');
+	data = $.observable( data );
+	same( data().arr().length, 3, "array length is correct after wrapping");
+	data().arr([]);
+	same( data().arr(), [], "array setter works as expected");
+	
+	ok($.isFunction( data().arr ), "array item object is wrapped");
+	
+	data().arr( ['a'] );
+	same( data().arr().length, 1, "array setter works");
+	same( data().arr(0)(), 'a', "primitive getter works as expected");
+	
+	data().arr(1, 'b');
+	same( data().arr(1)(), 'b', "primitive setter works");
+	
+	data().arr(1, {foo: 'bar'});
+	same( data().arr(1)().foo(), 'bar', "array item object wrapper returns proper value");
+	
+	data().arr(0, "changed");
+	same( data().arr(0)(), "changed");
+	
+});
+
+module("Array events & methods");
+
+test("push", function() {
+	var data = $.observable( [] );
+	var _newVal = null;
+	data.on('push', function(newVal) {
+		_newVal = newVal;
+	});
+	data().push( 42 );
+	same( _newVal, 42, "push event is fired" );
 });

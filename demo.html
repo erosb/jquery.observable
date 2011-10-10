@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>jquery.observable demo</title>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+		<script type="text/javascript" src="jquery.observable.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				
+				var user = $.observable({
+					name: 'Bence Eros',
+					email: 'crystal@cyclonephp.com'
+				});
+			
+				var updateUI = function(){
+					$('#user').html(user().name() + ' (' + user().email() + ')');
+				};
+			
+				user().email.on('change', updateUI)
+				user().name.on('change', updateUI)
+			
+				// end of model setup, adding event listeners
+				
+				$('#username').keyup(function() {
+					user().name( $(this).val() );
+				});
+				
+				$('#email').keyup(function() {
+					user().email( $(this).val() );
+				});
+			
+			});
+		</script>
+	</head>
+	<body>
+		<h1>jquery.observable demo</h1>
+		
+		<h2>Hello world</h2>
+		
+		<div id="user"></div>
+		
+		<input type="text" id="username"/>
+		<input type="text" id="email"/>
+		
+	</body>
+</html>

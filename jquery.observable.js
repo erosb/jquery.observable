@@ -115,7 +115,8 @@
 		observable.on = listenerAdder;
 		
 		observable.push = function(newItem) {
-			arr.push( $.observable(newItem) );
+			newItem = $.observable(newItem);
+			arr.push( newItem );
 			fireEvent( this, 'push', [newItem] );
 		}
 		

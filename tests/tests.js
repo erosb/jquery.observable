@@ -160,6 +160,9 @@ test("testing if an array is properly wrapped", function() {
 		same(key, 1, "key param is good in array.elemchange callback");
 		_newVal = newVal;
 	})
+	same( $.observable.remove( data().key2 ),  [1, 2, 3],  "testing raw array read");
+	
+	same( data().key2()(1)(), 2, "testing array item read");
 	data().key2()(1, 'new elem');
 	same(_newVal, 'new elem', "testing array.elemchange event");
 
@@ -171,3 +174,15 @@ test("testing if an array is properly wrapped", function() {
 	data().key2( [1] );
 });
 
+
+test("testing if array item objects are properly wrapped", function() {
+	var data = {
+		arr: 
+		[1, {
+			foo: 'bar'
+		}, 3]
+	};
+	data = $.observable(data);
+	ok($.isFunction( data().arr()(1) ), "checking if array item object is wrapped");
+	same( data().arr()(1)().foo(), 'bar');
+});

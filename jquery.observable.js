@@ -85,6 +85,9 @@
 					throw "must be called with 1 or 2 arguments, not " + arguments.length;
 			}
 		};
+		for ( var i = 0; i < arr.length; ++i ) {
+			arr[ i ] = $.observable( arr[ i ] );
+		}
 		observable.__observable = new Object();
 		observable.arr = arr;
 		return observable;

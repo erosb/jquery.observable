@@ -34,7 +34,7 @@ test("Testing Primitive wraps", function() {
 
 module("observable.remove");
 
-test("testing basic removals", function() {
+test("testing basic unwraps", function() {
 	var data = $.observable(42);
 	same(42, $.observable.remove(data), "testing primitive unwrap")
 	var rawData = {
@@ -133,6 +133,16 @@ test("testing multiple onChange listeners", function() {
 	data().key1.on('change', incrementCallCount);
 	data().key1('new val');
 	same(changeCallCount, 2, "both 2 onChange listeners called");
+});
+
+test("testing on([array]) behavior", function() {
+	var data = $.observable({key: 'val'});
+	var callCount = 0;
+	data().key.on( ['change', 'change'], function() {
+		++callCount;
+	})
+	data().key('foo');
+	same(callCount, 2, "[change, change] works");
 });
 
 test("testing if onChange avoids infinite recursion", function() {

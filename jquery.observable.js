@@ -55,6 +55,12 @@
 		observable.__observable = new Object();
 		
 		observable.on = function(event, listener) {
+			if ( $.isArray( event ) ) {
+				for ( var i = 0; i < event.length; ++i ) {
+					observable.on( event[ i ], listener );
+				}
+				return;
+			}
 			getEventListeners(this, event).push({
 				fn: listener
 			});
@@ -90,58 +96,19 @@
 		}
 		observable.__observable = new Object();
 		observable.arr = arr;
+		
+		
+		observable.push = function(newItem) {
+			arr.push( $.observable(newItem) );
+			fireEvent( cnt, 'push', [newItem] );
+		}
+		
 		return observable;
 	};
 		
 	
 	$.observable = function(data) {
 		return createObservableObject(data);
-		for ( var prop in data ) {
-				
-			var value = data[ prop ];
-				
-			data[ prop ] = (function(value, prop) {
-				
-				// binding recursively
-				if ( $.isPlainObject( value ) ) {
-					$.observable( value );
-				}
-					
-				var observable = function() {
-					if (arguments.length === 0) { // getter
-						return value;
-					} else { // setter
-						var oldVal = value;
-						value = arguments[ 0 ];
-					
-						fireEvent( data[ prop ], 'change'
-							, [value, $.observable.remove(oldVal)] );
-					
-						if ( $.isPlainObject( value ) ) {
-							value = $.observable( value );
-						}
-					}
-				};
-				// object for storing the metadata of the observable plugin
-				observable.__observable = new Object();
-				
-				observable.on = function(event, listener) {
-					getEventListeners(this, event).push({
-						fn: listener
-					});
-					return this;
-				}
-			
-				if ( $.isArray(value) ) {
-					value = createObservableArray( value, observable );
-				}
-								
-				return observable;
-			
-			})(value, prop);
-			
-		}
-		return data;
 	}
 	
 	$.observable.remove = function(data) {

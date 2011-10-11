@@ -305,14 +305,9 @@ test("shift()", function() {
 test("sort()", function() {
 	var data = $.observable( ['a', 'c', 'b'] );
 	var _called = false;
-	data.on("sort", function(sorted) {
-		_called = true;
-		same( $.observable.remove( sorted ), ['a', 'b', 'c'] );
-	});
 	data.sort();
-	ok(_called, "event handler called");
 	
-	_called = false;
+	var _called = false;
 	data.sort(function(x, y) {
 		ok( ! $.isFunction(x), "1st arg unwrapped");
 		ok( ! $.isFunction(y), "2nd arg unwrapped");

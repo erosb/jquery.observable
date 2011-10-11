@@ -170,9 +170,7 @@
 					, $.observable.remove( b )); // unwrapping the items before passing them to the callback
 			}
 			
-			var rval = arr.sort(comparator);
-			fireEvent( this, 'sort', [rval] );
-			return rval;
+			return arr.sort(comparator);
 		};
 		observable.unshift = function(elem) {
 			elem = $.observable( elem );

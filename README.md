@@ -109,8 +109,8 @@ Let's create a wrapped model that contains an array:
 Array methods
 -------------
 Since arrays are not simple values but collections, you can do some more operations for them
-than simply replacing them with a new value. Currently only the push method of the array
-wrapper is implemented, but until the first stable release all the other methods will be
+than simply replacing them with a new value. Currently only the mutator methods of the array
+wrapper are implemented, but until the first stable release all the other methods will be
 implemented the native Array has. Example on using the push method (using the above
 introduced model object):
 
@@ -120,16 +120,43 @@ introduced model object):
 	// it's wrong - this is a call on the native Array.push() method, so it's not controlled
 	// by the wrapper. The event listeners won't be fired, and the new item won't be wrapped.
 	user().emails().push('me@example.org');
+	
+Other methods:
+
+* each(callback): iterates on the array elements. Callback parameters: index, value. The value is
+wrapped. If the callback returns false, then the iteration is stopped.
+* size(): returns the length of the wrapped array. In this case arrayWrapper().length also works.
+* pop(): same as the native Array.pop(), but the returned value is wrapped, and it fires the 'pop' event.
+* reverse(): same as the native Array.reverse(), but it fires the 'reverse' event.
+* shift(): same as the native Array.shift(), but it fires the 'shift' event and the returned value is wrapped.
+* unshift(): same as the native Array.unshift(), but it fires the 'unshift' event, and wraps its
+parameter before prepending it to the wrapped array.
+* sort(): same as the native Array.sort(). The elements of the returned array are wrapped.
+The method takes one optional parameter, the comparator function. The comparator should take
+2 parameters, and should return less than 0 if the 1st parameter is lower than the 2nd parameter,
+0 is the two parameters are equal, and greater than 0 if the 1st parameter is greater than the
+2nd parameter. If the comparator function is not passed, then the sorting will be done using
+a default lexicographical comparator.
 
 Array events
 ------------
 
 Arrays are not simple values but collections, therefore there are some further events
 that can be observed on an array, not only the change event:
-- elemchange: this will be fired when an array element is replaced. The listeners will
+
+* elemchange: this will be fired when an array element is replaced. The listeners will
 receive 2 parameters: the already wrapped new value, and the unwrapped, plain old value (or undefined).
-- push: fired when a new element is pushed into the array. The listeners will receive 1
+* push: fired when a new element is pushed into the array. The listeners will receive 1
 parameter: the already wrapped new element.
+* pop: fired when the ArrayWrapper.pop() method is called. The listener parameter is the wrapped
+elem to be removed.
+* reverse: fired when the ArrayWrapper.reverse() method is called. The listener has no parameters.
+* shift: fired when the ArrayWrapper.shift() method is called. The parameter is the (wrapped)
+shifted array element.
+* unshift: fired when the ArrayWrapper.unshift() method is called. The parameter is the 
+already wrapped new array element.
+
+Note: in the event listeners the 'this' will always refer to the array wrapper.
 
 Removing the wrappers
 ---------------------

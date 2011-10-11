@@ -253,3 +253,16 @@ test("size()", function() {
 	data.push('d');
 	same( data.size(), 4, "size() works after push()" );
 });
+
+test("pop()", function() {
+	var data = $.observable( ['a', 'b', 'c'] );
+	var _poppedElem = null;
+	var _newSize = null;
+	data.on('pop', function(elem) {
+		_poppedElem = elem();
+		_newSize = this.size();
+	});
+	same(data.pop()(), 'c', "pop() method works")
+	same(_poppedElem, 'c', "pop event fired")
+	same(_newSize, 2, "size() works after pop()")
+});

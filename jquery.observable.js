@@ -130,6 +130,12 @@
 			return arr.length;
 		}
 		
+		observable.pop = function() {
+			var rval = arr.pop();
+			fireEvent( this, 'pop', [rval] );
+			return rval;
+		}
+		
 		return observable;
 	};
 		

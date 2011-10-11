@@ -172,6 +172,12 @@
 			fireEvent( this, 'sort', [rval] );
 			return rval;
 		};
+		observable.unshift = function(elem) {
+			elem = $.observable( elem );
+			arr.unshift( elem );
+			fireEvent(this, 'unshift', [elem] );
+		}
+		
 		
 		return observable;
 	};

@@ -316,3 +316,15 @@ test("sort()", function() {
 	ok(_called, "comparator called");
 	
 })
+
+test("unshift()", function() {
+	var data = $.observable( ['b', 'c'] );
+	var _called = false;
+	data.on("unshift", function(elem) {
+		_called = true;
+		same(elem(), 'a', "event handler correct arg");
+	});
+	data.unshift('a');
+	ok(_called, "event handler called");
+	same( $.observable.remove( data ), ['a', 'b', 'c'] );
+});

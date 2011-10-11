@@ -32,6 +32,11 @@ test("Testing Primitive wraps", function() {
 	ok($.isFunction(data().key1().subkey), true, "check observable packaging on setting object")
 });
 
+test("Testing avoiding multiple wraps", function() {
+	var doubleObserved = $.observable( $.observable(1) );
+	same( doubleObserved(), 1, "no double wrap");
+})
+
 module("observable.remove");
 
 test("testing basic unwraps", function() {
@@ -220,12 +225,31 @@ test("testing if array item objects are properly wrapped", function() {
 
 module("Array events & methods");
 
-test("push", function() {
+test("each()", function() {
+	var arr = $.observable( ['a', 'b', 'c'] );
+	
+	ok( $.isFunction(arr(0)), "testing initial array item wraps");
+	var readArr = [];
+	arr.each( function(idx, elem) {
+		readArr[idx] = elem();
+	});
+	same(readArr, ['a', 'b', 'c'], "testing wrappedArray.each()");
+})
+
+test("push()", function() {
 	var data = $.observable( [] );
 	var _newVal = null;
 	data.on('push', function(newVal) {
-		_newVal = newVal;
+		_newVal = newVal();
 	});
 	data.push( 42 );
 	same( _newVal, 42, "push event is fired" );
+});
+
+test("size()", function() {
+	var data = $.observable( ['a', 'b', 'c'] );
+	same( data.size(), 3, "size() works" );
+	
+	data.push('d');
+	same( data.size(), 4, "size() works after push()" );
 });

@@ -120,6 +120,16 @@
 			fireEvent( this, 'push', [newItem] );
 		}
 		
+		observable.each = function( callback ) {
+			for ( var i = 0; i < arr.length; ++i ) {
+				callback.call( null, i, arr[i] );
+			}
+		}
+		
+		observable.size = function() {
+			return arr.length;
+		}
+		
 		return observable;
 	};
 		
@@ -127,6 +137,9 @@
 	$.observable = function(data) {
 		if ( $.isArray(data) ) {
 			return createObservableArray( data );
+		}
+		if ( $.isFunction(data) && data.__observable ) {
+			return data;
 		}
 		return createObservableObject( data );
 	}

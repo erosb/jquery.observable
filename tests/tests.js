@@ -266,3 +266,17 @@ test("pop()", function() {
 	same(_poppedElem, 'c', "pop event fired")
 	same(_newSize, 2, "size() works after pop()")
 });
+
+test("reverse()", function() {
+	var arr = ['a', 'b', 'c'];
+	var data = $.observable( arr );
+	
+	var _called = false;
+	data.on("reverse", function() {
+		_called = true;
+		same($.observable.remove(this), ['c', 'b', 'a'] );
+	});
+	
+	data.reverse();
+	same(_called, true, "event handler called");
+});

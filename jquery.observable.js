@@ -136,6 +136,12 @@
 			return rval;
 		}
 		
+		observable.reverse = function() {
+			var rval = arr.reverse();
+			fireEvent( this, 'reverse', [] );
+			return rval;
+		};
+		
 		return observable;
 	};
 		

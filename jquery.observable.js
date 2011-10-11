@@ -137,14 +137,39 @@
 		}
 		
 		observable.reverse = function() {
-			var rval = arr.reverse();
+			arr.reverse();
 			fireEvent( this, 'reverse', [] );
-			return rval;
 		};
 		
 		observable.shift = function() {
 			var rval = arr.shift();
 			fireEvent( this, 'shift', [rval] );
+			return rval;
+		};
+		observable.sort = function( callback ) {
+			if ( callback ) {
+				if ( ! $.isFunction( callback )) {
+					throw "ArrayWrapper.sort() can only accept function parameter";
+				}
+			} else {
+				callback = function(a, b) { // a default callback with lexicographical ordering.
+					a = a.toString();
+					b = b.toString();
+					if (a == b) {
+						return 0;
+					} else if (a < b) {
+						return -1;
+					};
+					return 1;
+				};
+			}
+			comparator = function(a, b) {
+				return callback($.observable.remove( a )
+					, $.observable.remove( b )); // unwrapping the items before passing them to the callback
+			}
+			
+			var rval = arr.sort(comparator);
+			fireEvent( this, 'sort', [rval] );
 			return rval;
 		};
 		

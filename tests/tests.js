@@ -278,17 +278,41 @@ test("reverse()", function() {
 	});
 	
 	data.reverse();
-	same(_called, true, "event handler called");
+	ok(_called, "event handler called");
+	same($.observable.remove(data), ['c', 'b', 'a'])
 });
 
 test("shift()", function() {
 	var data = $.observable( ['a', 'b', 'c'] );
-	var first = data.shift()();
 	var _called = false;
 	data.on("shift", function(shiftedVal) {
 		_called = true;
-		same(shiftedVal, 'a', "event handler correct arg");
+		same(shiftedVal(), 'a', "event handler correct arg");
 	});
+	var first = data.shift()();
 	same(first, 'a', 'shift gave proper return value');
 	same($.observable.remove( data ), ['b', 'c'], "remaining array is correct");
+	ok(_called, "event handler called");
 });
+
+
+test("sort()", function() {
+	var data = $.observable( ['a', 'c', 'b'] );
+	var _called = false;
+	data.on("sort", function(sorted) {
+		_called = true;
+		same( $.observable.remove( sorted ), ['a', 'b', 'c'] );
+	});
+	data.sort();
+	ok(_called, "event handler called");
+	
+	_called = false;
+	data.sort(function(x, y) {
+		ok( ! $.isFunction(x), "1st arg unwrapped");
+		ok( ! $.isFunction(y), "2nd arg unwrapped");
+		_called = true;
+		return x > y;
+	});
+	ok(_called, "comparator called");
+	
+})

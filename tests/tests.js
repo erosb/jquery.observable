@@ -280,3 +280,15 @@ test("reverse()", function() {
 	data.reverse();
 	same(_called, true, "event handler called");
 });
+
+test("shift()", function() {
+	var data = $.observable( ['a', 'b', 'c'] );
+	var first = data.shift()();
+	var _called = false;
+	data.on("shift", function(shiftedVal) {
+		_called = true;
+		same(shiftedVal, 'a', "event handler correct arg");
+	});
+	same(first, 'a', 'shift gave proper return value');
+	same($.observable.remove( data ), ['b', 'c'], "remaining array is correct");
+});

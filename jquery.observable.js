@@ -142,6 +142,12 @@
 			return rval;
 		};
 		
+		observable.shift = function() {
+			var rval = arr.shift();
+			fireEvent( this, 'shift', [rval] );
+			return rval;
+		};
+		
 		return observable;
 	};
 		

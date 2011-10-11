@@ -122,7 +122,9 @@
 		
 		observable.each = function( callback ) {
 			for ( var i = 0; i < arr.length; ++i ) {
-				callback.call( null, i, arr[i] );
+				if ( callback.call( null, i, arr[i] ) === false ) {
+					break;
+				}
 			}
 		}
 		

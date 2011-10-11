@@ -234,6 +234,12 @@ test("each()", function() {
 		readArr[idx] = elem();
 	});
 	same(readArr, ['a', 'b', 'c'], "testing wrappedArray.each()");
+	var _callCount = 0;
+	arr.each( function() {
+		_callCount++;
+		return false;
+	});
+	same(_callCount, 1, "return false; works");
 })
 
 test("push()", function() {

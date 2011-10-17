@@ -93,7 +93,9 @@
 				case 1:
 					var arg = arguments[0];
 					if ( $.isArray( arg ) ) {
-						arr = observableArrayItems( arg );
+						var newVal = observableArrayItems( arg );
+						fireEvent(observable, 'change', [newVal, $.observable.remove(arr) ]);
+						arr = newVal;
 					} else {
 						return arr[ arg ];
 					}

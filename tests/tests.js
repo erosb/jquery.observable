@@ -187,12 +187,16 @@ test("testing basic array events", function() {
 	same(_newVal, 'new elem', "testing array.elemchange newVal");
 	same(_oldVal, 2, "testing array.elemchange oldVal");
 
+	var _called = false;
 	data().key2.on('change', function(newVal, oldVal){
+		newVal = $.observable.remove( newVal );
 		same(newVal, [1], "check array.change newVal param");
 		same(oldVal, [1, 'new elem', 3], "check array.change oldVal param");
+		_called = true;
 	});
 	
 	data().key2( [1] );
+	ok(_called, "array.change fired");
 });
 
 
@@ -241,6 +245,16 @@ test("each()", function() {
 	});
 	same(_callCount, 1, "return false; works");
 })
+
+test("change", function() {
+	var data = $.observable( ['a'] );
+	var _called = false;
+	data.on('change', function() {
+		_called = true;
+	})
+	data( [] );
+	ok(_called, "onchange event fired")
+});
 
 test("push()", function() {
 	var data = $.observable( [] );

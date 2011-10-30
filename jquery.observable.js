@@ -1,11 +1,12 @@
 (function($) {
+	"use strict";
 	
 	var getEventListeners = function( data, event ) {
 		var metadata = data.__observable;
 		if (metadata.eventlisteners === undefined) {
 			metadata.eventlisteners = {
 				'change': []
-			}
+			};
 		}
 		if ( event === undefined ) {
 			return metadata.eventlisteners;
@@ -14,7 +15,7 @@
 			metadata.eventlisteners[event] = [];
 		}
 		return metadata.eventlisteners[event];
-	}
+	};
 	
 	var fireEvent = function(data, event, params) {
 		var listeners = getEventListeners(data, event);
@@ -28,7 +29,7 @@
 				listener.isRunning = false;
 			}
 		}
-	}
+	};
 	
 	
 	// this function will be the on() method of all wrappers
@@ -59,8 +60,7 @@
 				var oldVal = $.observable.remove(observable);
 				value = arguments[ 0 ];
 			
-				fireEvent( observable, 'change'
-					, [value, oldVal] );
+				fireEvent( observable, 'change', [value, oldVal] );
 			
 				if ( $.isPlainObject( value ) ) {
 					for (var i in value) {
@@ -70,38 +70,39 @@
 			}
 		};
 		
-		observable.__observable = new Object();
+		observable.__observable = {};
 		
 		observable.on = listenerAdder;
 		
 		return observable;
-	}
+	};
 	
 	var observableArrayItems = function(arr) {
 		for (var i = 0; i < arr.length; ++i) {
 			arr[ i ] = $.observable(arr[ i ]);
 		}
 		return arr;
-	}
+	};
 	
 	var createObservableArray = function(arr) {
 		
 		var observable = function() {
+			var oldVal, newVal;
 			switch (arguments.length) {
 				case 0:
 					return arr;
 				case 1:
 					var arg = arguments[0];
 					if ( $.isArray( arg ) ) {
-						var newVal = observableArrayItems( arg );
-						fireEvent(observable, 'change', [newVal, $.observable.remove(arr) ]);
-						arr = newVal;
+						oldVal = $.observable.remove(arr);
+						arr = observableArrayItems( arg );
+						fireEvent(observable, 'change', [arr, oldVal ]);
 					} else {
 						return arr[ arg ];
 					}
 					break;
 				case 2:
-					var oldVal = $.observable.remove( arr[ arguments[0] ] ), newVal;
+					oldVal = $.observable.remove( arr[ arguments[0] ] );
 					arr[ arguments[0] ] = newVal = $.observable( arguments[1] );
 					fireEvent(observable, 'elemchange', [arguments[0], newVal, oldVal]);
 					break;
@@ -112,7 +113,7 @@
 		
 		arr = observableArrayItems( arr );
 		
-		observable.__observable = new Object();
+		observable.__observable = {};
 		
 		observable.on = listenerAdder;
 		
@@ -120,7 +121,7 @@
 			newItem = $.observable(newItem);
 			arr.push( newItem );
 			fireEvent( this, 'push', [newItem] );
-		}
+		};
 		
 		observable.each = function( callback ) {
 			for ( var i = 0; i < arr.length; ++i ) {
@@ -128,17 +129,17 @@
 					break;
 				}
 			}
-		}
+		};
 		
 		observable.size = function() {
 			return arr.length;
-		}
+		};
 		
 		observable.pop = function() {
 			var rval = arr.pop();
 			fireEvent( this, 'pop', [rval] );
 			return rval;
-		}
+		};
 		
 		observable.reverse = function() {
 			arr.reverse();
@@ -159,18 +160,18 @@
 				callback = function(a, b) { // a default callback with lexicographical ordering.
 					a = a.toString();
 					b = b.toString();
-					if (a == b) {
+					if (a === b) {
 						return 0;
 					} else if (a < b) {
 						return -1;
-					};
+					}
 					return 1;
 				};
 			}
-			comparator = function(a, b) {
-				return callback($.observable.remove( a )
-					, $.observable.remove( b )); // unwrapping the items before passing them to the callback
-			}
+			var comparator = function(a, b) {
+				return callback($.observable.remove( a ), 
+					$.observable.remove( b )); // unwrapping the items before passing them to the callback
+			};
 			
 			return arr.sort(comparator);
 		};
@@ -178,7 +179,7 @@
 			elem = $.observable( elem );
 			arr.unshift( elem );
 			fireEvent(this, 'unshift', [elem] );
-		}
+		};
 		
 		
 		return observable;
@@ -193,13 +194,13 @@
 			return data;
 		}
 		return createObservableObject( data );
-	}
+	};
 	
 	$.observable.remove = function(data) {
+		var rval = [], i;
 		if ( ! $.isFunction(data)) {
 			if ( $.isArray(data) ) {
-				var rval = new Array();
-				for ( var i = 0; i < data.length; ++i ) {
+				for ( i = 0; i < data.length; ++i ) {
 					rval[ i ] = $.observable.remove( data[ i ] );
 				}
 			}
@@ -208,19 +209,18 @@
 		var rawData = data(); // getting the raw object
 		
 		if ( $.isArray(rawData) ) {
-			var rval = new Array();
-			for(var i = 0; i < rawData.length; ++i ) {
+			for( i = 0; i < rawData.length; ++i ) {
 				rval[ i ] = $.observable.remove( rawData[ i ] );
 			}
 			return rval;
 		} else if ($.isPlainObject( rawData ) ) {
-			rval = new Object();
+			rval = {};
 			for ( var prop in rawData ) {
 				rval[ prop ] = $.observable.remove( rawData[ prop ] );
 			}
 			return rval;
 		}
 		return rawData;
-	}
+	};
 	
 })(jQuery);

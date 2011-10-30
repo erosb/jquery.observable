@@ -49,7 +49,9 @@
 	var createObservableObject = function(value) {
 		if ( $.isPlainObject(value) ) {
 			for ( var i in value ) {
-				value[ i ] = $.observable( value[ i ] );
+				if (value.hasOwnProperty( i )) {
+					value[ i ] = $.observable( value[ i ] );
+				}
 			}
 		}
 		
@@ -64,7 +66,9 @@
 			
 				if ( $.isPlainObject( value ) ) {
 					for (var i in value) {
-						value[ i ] = $.observable( value[ i ] );
+						if (value.hasOwnProperty( i )) {
+							value[ i ] = $.observable( value[ i ] );
+						}
 					}
 				}
 			}
@@ -216,7 +220,9 @@
 		} else if ($.isPlainObject( rawData ) ) {
 			rval = {};
 			for ( var prop in rawData ) {
-				rval[ prop ] = $.observable.remove( rawData[ prop ] );
+				if (rawData.hasOwnProperty(prop)) {
+					rval[ prop ] = $.observable.remove( rawData[ prop ] );
+				}
 			}
 			return rval;
 		}

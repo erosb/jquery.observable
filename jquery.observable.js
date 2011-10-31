@@ -127,7 +127,7 @@
 			fireEvent( this, 'push', [newItem] );
 		};
 		
-		observable.each = function( callback ) {
+		observable.forEach = function( callback ) {
 			for ( var i = 0; i < arr.length; ++i ) {
 				if ( callback.call( null, i, arr[i] ) === false ) {
 					break;

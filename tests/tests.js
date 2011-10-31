@@ -229,17 +229,17 @@ test("testing if array item objects are properly wrapped", function() {
 
 module("Array events & methods");
 
-test("each()", function() {
+test("forEach()", function() {
 	var arr = $.observable( ['a', 'b', 'c'] );
 	
 	ok( $.isFunction(arr(0)), "testing initial array item wraps");
 	var readArr = [];
-	arr.each( function(idx, elem) {
+	arr.forEach( function(idx, elem) {
 		readArr[idx] = elem();
 	});
-	same(readArr, ['a', 'b', 'c'], "testing wrappedArray.each()");
+	same(readArr, ['a', 'b', 'c'], "testing wrappedArray.forEach()");
 	var _callCount = 0;
-	arr.each( function() {
+	arr.forEach( function() {
 		_callCount++;
 		return false;
 	});

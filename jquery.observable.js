@@ -63,7 +63,14 @@
 				value = arguments[ 0 ];
 			
 				fireEvent( observable, 'change', [value, oldVal] );
+
+                var isObservable = ($.isFunction( value )
+                      && value.__observable !== undefined );
 			
+                if (isObservable) {
+                      value = value();
+                }
+
 				if ( $.isPlainObject( value ) ) {
 					for (var i in value) {
 						if (value.hasOwnProperty( i )) {

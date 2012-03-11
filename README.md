@@ -54,7 +54,10 @@ model properties that will be fired by the wrapper function whenever the propert
 is written.
 
 	user().name.on('change', function(newVal, oldVal) {
-		$('#username').html(newVal); // let's update our UI whenever the name of the user changes
+		// the new value (newVal) is wrapped into an observable already
+		// therefore in the event handlers its possible to add further
+		// event handlers if its needed
+		$('#username').html(newVal()); // let's update our UI whenever the name of the user changes
 	})
 
 	user().name('Somebody Else'); //this call will fire the above function

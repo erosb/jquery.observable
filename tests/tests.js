@@ -100,7 +100,7 @@ test("testing basic onChange event", function() {
 		
 	var _newVal, _oldVal;
 	var valSaver = function (newVal, oldVal) {
-		_newVal = newVal;
+		_newVal = newVal();
 		_oldVal = oldVal;
 	};
 	data().key1.on('change', valSaver);
@@ -132,7 +132,7 @@ test("testing multiple onChange listeners", function() {
 	var incrementCallCount = function(newVal, oldVal) {
 		++changeCallCount;
 		same(oldVal, "val", "the old value is 'val'");
-		same(newVal, "new val", "the new value is 'new val'");
+		same(newVal(), "new val", "the new value is 'new val'");
 	}
 	data().key1.on('change', incrementCallCount);
 	data().key1.on('change', incrementCallCount);

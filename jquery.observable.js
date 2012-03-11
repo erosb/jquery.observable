@@ -62,8 +62,6 @@
 				var oldVal = $.observable.remove(observable);
 				value = arguments[ 0 ];
 			
-				fireEvent( observable, 'change', [value, oldVal] );
-
                 var isObservable = ($.isFunction( value )
                       && value.__observable !== undefined );
 			
@@ -78,6 +76,7 @@
 						}
 					}
 				}
+				fireEvent( observable, 'change', [observable, oldVal] );
 			}
 		};
 		

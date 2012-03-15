@@ -63,6 +63,17 @@
 			listeners[listenerID] = undefined;
 		}
 	};
+	
+	var listenerCount = function(event) {
+		var eventListeners = getEventListeners(this, event);
+		var rval = 0;
+		for (var i = 0; i < eventListeners.length; ++i) {
+			if ( eventListeners[i] ){
+				++rval;
+			}
+		}
+		return rval;
+	}
 		
 	var createObservableObject = function(value) {
 		if ( $.isPlainObject(value) ) {
@@ -103,6 +114,8 @@
 		observable.on = listenerAdder;
 		
 		observable.off = listenerRemover;
+		
+		observable.listenerCount = listenerCount;
 		
 		return observable;
 	};

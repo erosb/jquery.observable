@@ -176,6 +176,20 @@ test("removing event listeners", function() {
 	same(callCount, 1);
 });
 
+test("listenerCount() test", function() {
+	var data = $.observable({a: "a"});
+	var listenerID1 = data().a.on("change", function(){});
+	var listenerID2 = data().a.on("change", function(){});
+	
+	same(data().a.listenerCount("change"), 2);
+
+	data().a.off("change", listenerID2);
+	same(data().a.listenerCount("change"), 1);
+	
+	data().a.off("change", listenerID1);
+	same(data().a.listenerCount("change"), 0);
+});
+
 module("Array basics");
 
 test("testing basic array events", function() {

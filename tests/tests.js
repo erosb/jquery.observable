@@ -160,7 +160,21 @@ test("testing if onChange avoids infinite recursion", function() {
 	});
 	data().key('new val');
 	ok(true, "avoided");
-})
+});
+
+test("removing event listeners", function() {
+	var data = $.observable({a: "a"});
+	var callCount = 0;
+	var listenerID = data().a.on("change", function() {
+		++callCount;
+	});
+	data().a("aa");
+	same(callCount, 1);
+	
+	data().a.off("change", listenerID);
+	data().a("a");
+	same(callCount, 1);
+});
 
 module("Array basics");
 

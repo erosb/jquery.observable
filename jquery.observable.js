@@ -21,6 +21,8 @@
 		var listeners = getEventListeners(data, event);
 		for ( var i = 0; i < listeners.length; ++i ) {
 			var listener = listeners[i];
+			if (listener === undefined)
+				continue;
 			// listener.isRunning is a flag/lock to avoid infinite recursions (eg. when the data is modified
 			// by the listener function, then the same listener won't be called again
 			if ( ! listener.isRunning ) {
@@ -40,10 +42,19 @@
 			}
 			return;
 		}
-		getEventListeners(this, event).push({
+		var listeners = getEventListeners(this, event);
+		var rval = listeners.length;
+		listeners.push({
 			fn: listener
 		});
-		return this;
+		return rval;
+	};
+	
+	var listenerRemover = function(event, listenerID) {
+		var listeners = getEventListeners(this, event);
+		if (listeners[listenerID] !== undefined) {
+			listeners[listenerID] = undefined;
+		}
 	};
 		
 	var createObservableObject = function(value) {
@@ -55,7 +66,7 @@
 			}
 		}
 		
-		var observable = function() {
+		var observable = function observableObject() {
 			if (arguments.length === 0) { // getter
 				return value;
 			} else { // setter
@@ -83,6 +94,8 @@
 		observable.__observable = {};
 		
 		observable.on = listenerAdder;
+		
+		observable.off = listenerRemover;
 		
 		return observable;
 	};

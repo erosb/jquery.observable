@@ -19,7 +19,14 @@
 	
 	var fireEvent = function(data, event, params) {
 		var listeners = getEventListeners(data, event);
-		for ( var i = 0; i < listeners.length; ++i ) {
+		// listeners.length can change during the iteration, since
+		// the event handlers can add new event handlers for the fired event.
+		// we don't want to run the event handlers which have been added after
+		// the event occured (ie. which has been added after the iteration has been started)
+		// therefore we save the current number of listeners to a local variable
+		// before starting the iteration
+		var listenerCount = listeners.length;
+		for ( var i = 0; i < listenerCount; ++i ) {
 			var listener = listeners[i];
 			if (listener === undefined)
 				continue;

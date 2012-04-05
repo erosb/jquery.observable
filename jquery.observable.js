@@ -44,10 +44,11 @@
 	// this function will be the on() method of all wrappers
 	var listenerAdder = function(event, listener) {
 		if ( $.isArray( event ) ) {
+			var rval = [];
 			for ( var i = 0; i < event.length; ++i ) {
-				this.on( event[ i ], listener );
+				rval.push( this.on( event[ i ], listener ) );
 			}
-			return;
+			return rval;
 		}
 		var listeners = getEventListeners(this, event);
 		var rval = listeners.length;

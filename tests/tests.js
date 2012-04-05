@@ -143,11 +143,17 @@ test("testing multiple onChange listeners", function() {
 test("testing on([array]) behavior", function() {
 	var data = $.observable({key: 'val'});
 	var callCount = 0;
-	data().key.on( ['change', 'change'], function() {
+	var listenerIDs = data().key.on( ['change', 'change'], function() {
 		++callCount;
-	})
+	});
+	ok($.isArray(listenerIDs));
 	data().key('foo');
 	same(callCount, 2, "[change, change] works");
+	
+	callCount = 0;
+	data().key.off("change", listenerIDs[ 0 ] );
+	data().key("bar");
+	same( callCount, 1 );
 });
 
 test("testing if onChange avoids infinite recursion", function() {

@@ -67,7 +67,7 @@ functions, since we could have create the original data structure with private p
 and a setter method for the name property.
 
 At the very least this method has a very important
-advantage: it's not necessary for the model to implement it's accessor methods, and it does not have
+advantage: it's not necessary for the model to implement its accessor methods, and it does not have
 to directly communicate with their clients. It's possible to set up an onChange listener
 by the view to update itself immediately when the model changes, an other one by the
 controller to do whatever specific action, and a third one by the model, which is used to

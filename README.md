@@ -29,7 +29,7 @@ maintains its value, and calls the configured event listeners if the value chang
 properties of the user object will also be wrapped. Let's see how to work with the wrapped
 values.
 
-	// if you want to read a value, then you have to call its wrapper function withot parameters
+	// if you want to read a value, then you have to call its wrapper function without parameters
 	// note that the return value of the user() call returned an object that represents
 	// the original user object, but the properties are wrapped
 	console.log( user().name() );

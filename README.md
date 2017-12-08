@@ -1,3 +1,9 @@
+This project is deprecated
+==========================
+
+The `jquery.observable` library was developed in 2011 - 2012, and no further improvements are planned.
+
+
 jquery.observable
 =================
 
